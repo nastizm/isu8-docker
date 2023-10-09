@@ -1,0 +1,41 @@
+version: '3'
+services:
+    go:
+        build:
+            context: ./webapp/go
+            dockerfile: Dockerfile
+            target: dev #　←ここ
+        working_dir: /go/src/webapp/go
+        environment:
+            TZ: Asia/Tokyo
+            DB_USER: isucon
+            DB_PASS: isucon
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_DATABASE: torb
+        ports:
+            - 8080:8080
+            - 2345:2345
+
+    mysql:
+        build: ./mysql
+        environment:
+            TZ: Asia/Tokyo
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: root
+        ports:
+            - 13306:3306
+        volumes:
+            - mysql_volume:/var/lib/mysql
+        command:
+
+    nginx:
+        container_name: "nginx"
+        build: ./nginx
+        ports:
+            - "80:80"
+        depends_on:
+            - "go"
+
+volumes:
+    mysql_volume:
